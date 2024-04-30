@@ -293,8 +293,8 @@
                     let peso2 = Math.round(img.peso2 / 1024)
                     htmlPreview += `
                 <tr>
-                    <td >
-                        <div style="width: 3.5em; height: 3.5em; min-height: 3.5em; display: flex; align-items: center; justify-content: center; flex-direction: row; overflow: hidden; border-radius: 0.5em;">
+                    <td style="min-height: 3.5em !important;">
+                        <div style="width: 3.5em; height: 3.5em; display: flex; align-items: center; justify-content: center; flex-direction: row; overflow: hidden; border-radius: 0.5em;">
                             ${img.area === "C" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="width: -webkit-fill-available; height:-webkit-fill-available;">` : ``}
                             ${img.area === "RH" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="height:-webkit-fill-available;">` : ``}
                             ${img.area === "RV" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="width: -webkit-fill-available;">` : ``}
