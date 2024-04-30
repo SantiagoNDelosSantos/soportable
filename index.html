@@ -292,22 +292,18 @@
                     let peso = Math.round(img.peso / 1024)
                     let peso2 = Math.round(img.peso2 / 1024)
                     htmlPreview += `
-                <tr class="drag-handle">
+                <tr>
                     <td >
                         <div style="width: 3.5em; height: 3.5em; display: flex; align-items: center; justify-content: center; flex-direction: row; overflow: hidden; border-radius: 0.5em;">
                             ${img.area === "C" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="width: -webkit-fill-available; height:-webkit-fill-available;">` : ``}
                             ${img.area === "RH" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="height:-webkit-fill-available;">` : ``}
                             ${img.area === "RV" ? `<img onclick="preview(${img.idSimil})" src="${objectURL}" style="width: -webkit-fill-available;">` : ``}
                         </div>
-                        <div style="display:flex; flex-direction: column; align-items: center; justify-content: center; height: 3em;">
+                        <div id="sortable-handle-${index}" class="sortable-handle"  style="display:flex; flex-direction: column; align-items: center; justify-content: center; height: 3em;">
                             <p style="font-size: smaller; font-weight: bold; margin: 0em; padding: 0.5em" title="${img.name}">${img.name.length > 13 ? img.name.substring(0, 13) + '...' : img.name}</p>
                             <p style="font-size: smaller; margin: 0em; padding: 0.5em">${peso} KB a ${peso2} KB</p>
                         </div>
-                        <div class="actions">
-                            ${index !== 0 ? `<svg class="svg" onclick="moveUp(${index})" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4"/></svg>` : ``}
-                            ${index === 0 ? `<svg class="svg2" style="color: white;" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4"/></svg>` : ``}
-                            ${index !== allFiles.length - 1 ? `<svg class="svg" onclick="moveDown(${index})"  class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14-4-4m4 4 4-4"/></svg>` : ``}
-                            ${index === allFiles.length - 1 ? `<svg class="svg2" style="color: white;" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19V5m0 14-4-4m4 4 4-4"/></svg>` : ``}
+                        <div class="actions" data-draggable="false" >
                             <svg class="svg" onclick="editImg(${index})" class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
                             </svg>
@@ -320,39 +316,23 @@
                 })
                 table.innerHTML = htmlPreview;
                 divTabla.style = "display: block";
-
                 const tbody = document.getElementById('tablaPreview').getElementsByTagName('tbody')[0];
-
-
-                new Sortable(tbody, {
-                    animation: 150, // duración de la animación en milisegundos
+                const sortable = new Sortable(tbody, {
+                    animation: 150, // Duración de la animación en milisegundos
                     ghostClass: 'sortable-ghost', // clase CSS para el elemento fantasma durante el arrastre
-                    handle: '.drag-handle' // Selector para los elementos que se pueden arrastrar
+                    handle: '.sortable-handle', // Selector para los elementos que se pueden arrastrar
+                    onEnd: function (evt) {
+                        // Cada que cambiamos un elemento d lugar, primero actualizamos su lugar en el array de allFiles.
+                        const { oldIndex, newIndex } = evt;
+                        const movedFile = allFiles.splice(oldIndex, 1)[0];
+                        allFiles.splice(newIndex, 0, movedFile);
+                        // Luego volvemos a cargar la tabla para que se actualicen los id (index) de los botones.
+                        mostrarImagenesEnTabla()
+                        console.log(allFiles)
+                    }
                 });
-
             } else {
                 divTabla.style = "display: none";
-            }
-
-        }
-
-
-
-        // Funciones base para los bótones de la tabla:
-        function moveUp(index) {
-            if (index > 0) {
-                const temp = allFiles[index];
-                allFiles[index] = allFiles[index - 1];
-                allFiles[index - 1] = temp;
-                mostrarImagenesEnTabla();
-            }
-        }
-        function moveDown(index) {
-            if (index < allFiles.length - 1) {
-                const temp = allFiles[index];
-                allFiles[index] = allFiles[index + 1];
-                allFiles[index + 1] = temp;
-                mostrarImagenesEnTabla();
             }
         }
 
@@ -454,7 +434,6 @@
                 });
             })
             // LUEGO DE RECORTAR LA IMAGEN HAY QUE GUIARSE POR EL NAME DEL ARCHIVO PARA GUARDAR EL RECORTE, ESTO POR SI EL USUARIO CAMBIA DE LUGAR LOS ARCHIVOS, SI FUESE POR EL INDEX PODRIA GUARDARSE EL RECORTE EN EL ARCHIVO INCORRECTO. 
-
             let cerrarEdit = document.getElementById("cerrarCropBtn")
             cerrarEdit.addEventListener('click', () => {
                 divCrop.innerHTML = ""
@@ -473,12 +452,6 @@
             actualizarParrafo(allFiles)
             mostrarImagenesEnTabla()
         }
-
-
-
-
-
-
 
         // Función para comprimir una imagen si es necesario (Bloque 04)
         async function comprimirImagen(imagenComoArchivo) {
