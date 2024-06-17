@@ -121,15 +121,6 @@
             display: none;
         }
 
-        .shapes {
-            border: 0.2em dashed black;
-            cursor: pointer;
-        }
-
-        .shapes:hover {
-            border: 0.2em dashed #009FF5;
-        }
-
         .cropper-view-box {
             outline: 2px dashed #009FF5;
         }
@@ -385,9 +376,9 @@
                 <div style="width: 100%; display:flex; justify-content: space-between; align-items: center; flex-direction: row; margin: 1.5em 0em;">
                     <button id="recortarBtn">Recortar</button>
                     <div style="display: flex; align-items: center; justify-content: space-evenly; width: 100%;">
-                        <div id="cropC" class="shapes" style=" width: 1em; height: 1em;" ></div>
-                        <div id="cropRV" class="shapes" style=" width: 1em; height: 2em;" ></div>
-                        <div id="cropRH" class="shapes" style=" width: 2em; height: 1em;" ></div>
+                        <div id="cropC" class="shapes" ><p><b>1:1</b></p></div>
+                        <div id="cropRV" class="shapes"><p><b>2:3</b></p></div>
+                        <div id="cropRH" class="shapes"><p><b>4:3</b></p></div>
                     </div>
                     <button id="cerrarCropBtn">Cerrar editor</button>
                 </div>
@@ -409,11 +400,11 @@
                 cropper.setAspectRatio(areaRatio);
             });
             cropRV.addEventListener('click', () => {
-                areaRatio = 9 / 16;
+                areaRatio = 2 / 3;
                 cropper.setAspectRatio(areaRatio);
             });
             cropRH.addEventListener('click', () => {
-                areaRatio = 16 / 9;
+                areaRatio = 4 / 3;
                 cropper.setAspectRatio(areaRatio);
             });
             let recortarBtn = document.getElementById("recortarBtn")
